@@ -46,5 +46,30 @@ export class UserController {
      }
   }
 
-  
+  @Put("create")
+  async Signup(
+      @Body() CreateUserDto: CreateUserDto,
+      @Res() res: Response
+  ) {
+      const toAddData = {
+         "name": CreateUserDto.name,
+         "email": CreateUserDto.email,
+         "password": CreateUserDto.password
+      }
+      const checkEmail = await this.appService.findAll(toAddData);
+
+      if (checkEmail.length > 0) {
+         res.status(HttpStatus.OK).json({
+            'msg': "already exist email"
+         });
+         return;
+      }
+
+      const userData = await this.appService.create(toAddData);
+      res.status(HttpStatus.OK).json({
+         'msg': "Signup success",
+         "user": userData,
+      });
+  }
+
 }
