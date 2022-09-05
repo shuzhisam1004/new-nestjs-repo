@@ -107,4 +107,30 @@ export class UserController {
       });
    }
 
+   @Put("partner/add")
+   async AddPartner(
+       @Body() AddParterDto: AddParterDto,
+       @Res() res: Response
+    ) {
+      const partnerCheck = await this.appService.findAll({
+         "email": AddParterDto.email,
+         "partners.email": AddParterDto.partner_email
+      });
+
+      if (partnerCheck.length > 0) {
+         return res.status(HttpStatus.OK).json({
+            "msg": "Already partner added",
+         });  
+      }
+
+       const user = await this.appService.update(
+          {"email": AddParterDto.email},
+          { "$push": { "partners": {email: AddParterDto.partner_email} } }
+       );
+ 
+       return res.status(HttpStatus.OK).json({
+          "user": user,
+       });
+    }
+
 }
