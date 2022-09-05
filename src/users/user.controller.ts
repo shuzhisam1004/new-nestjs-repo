@@ -148,5 +148,42 @@ export class UserController {
       });
    }
    
+   @Post("partner/list")
+   async listRequest (
+      @Body() listRequestDto: listRequestDto,
+      @Res() res: Response
+   ) {
+      const user = await this.appService.aggregate([
+         {$match: {email: listRequestDto.email}},
+         {$lookup: {
+            from: "user",
+            localField: "partners.email",
+            foreignField: "email",
+            as: "partners_detail"
+         }},
+         {$unwind: {
+            path: "$partners_detail",
+            preserveNullAndEmptyArrays: true
+         }}
+      ]);
+console.log(user);
+      return res.status(HttpStatus.OK).json({ 
+         "user": user,
+      });
+   }
 
+   @Delete()
+   async DelPartner (
+      @Body() DelPartner: DelPartner,
+      @Res() res: Response
+   ) {
+      const user = await this.appService.update(
+         {"email": DelPartner.main_email},
+         { $pull: { partners: DelPartner.partner_email } }
+      );
+
+      return res.status(HttpStatus.OK).json({
+         "user": user,
+      });
+   }
 }
