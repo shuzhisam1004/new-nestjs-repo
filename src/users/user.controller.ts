@@ -133,4 +133,20 @@ export class UserController {
        });
     }
 
+   @Post("partner/accept")
+   async Accept (
+      @Body() AddParterDto: AddParterDto,
+      @Res() res: Response
+   ) {
+      const user = await this.appService.update(
+         {"email": AddParterDto.email},
+         { "$push": { "partners": { email: AddParterDto.partner_email } } }
+      );
+
+      return res.status(HttpStatus.OK).json({
+         "user": user,
+      });
+   }
+   
+
 }
