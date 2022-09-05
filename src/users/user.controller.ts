@@ -72,4 +72,39 @@ export class UserController {
       });
   }
 
+  @Patch("changepassword")
+  async ChangePassword(
+      @Body() ChangePasswordDto: ChangePasswordDto,
+      @Res() res: Response
+   ) {
+      const userInfo = await this.appService.findAll({"email": ChangePasswordDto.email});
+      
+      if (userInfo.length == 0) {
+         res.status(HttpStatus.OK).json({
+            'msg': "user does not exist"
+         });
+         return;
+      }
+
+      if (userInfo[0].password != ChangePasswordDto.current_password) {
+         res.status(HttpStatus.OK).json({
+            'msg': "incorrect password"
+         });
+         return;
+      }
+
+      const filter = {
+         "email": ChangePasswordDto.email
+      };
+      const updateData = {
+         "password": ChangePasswordDto.new_password
+      };
+
+      const userData = await this.appService.update(filter, updateData);
+      res.status(HttpStatus.OK).json({
+         'msg': "success change",
+         "user": userData,
+      });
+   }
+
 }
