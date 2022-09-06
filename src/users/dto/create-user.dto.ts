@@ -25,6 +25,6 @@ export class listRequestDto {
 }
 
 export class DelPartner {
-    main_email: string;
+    email: string;
     partner_email: string;
 }

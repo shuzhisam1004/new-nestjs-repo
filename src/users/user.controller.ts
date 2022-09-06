@@ -156,30 +156,26 @@ export class UserController {
       const user = await this.appService.aggregate([
          {$match: {email: listRequestDto.email}},
          {$lookup: {
-            from: "user",
+            from: "users",
             localField: "partners.email",
             foreignField: "email",
             as: "partners_detail"
-         }},
-         {$unwind: {
-            path: "$partners_detail",
-            preserveNullAndEmptyArrays: true
          }}
       ]);
-console.log(user);
+
       return res.status(HttpStatus.OK).json({ 
          "user": user,
       });
    }
 
-   @Delete()
+   @Delete("partner/del")
    async DelPartner (
       @Body() DelPartner: DelPartner,
       @Res() res: Response
    ) {
       const user = await this.appService.update(
-         {"email": DelPartner.main_email},
-         { $pull: { partners: DelPartner.partner_email } }
+         {"email": DelPartner.email},
+         { $pull: { partners: {email: DelPartner.partner_email} } }
       );
 
       return res.status(HttpStatus.OK).json({
